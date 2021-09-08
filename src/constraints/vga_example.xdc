@@ -8,6 +8,15 @@ set_false_path -to [get_cells  -hier {*seq_reg*[0]} -filter {is_sequential}]
 set_property PHASESHIFT_MODE WAVEFORM [get_cells -hierarchical *adv*]
 
 
+# leds
+set_property PACKAGE_PIN U16 [get_ports {ld0}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {ld0}]
+set_property PACKAGE_PIN E19 [get_ports {ld1}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {ld1}]
+set_property PACKAGE_PIN U19 [get_ports {ld2}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {ld2}]
+set_property PACKAGE_PIN V19 [get_ports {ld3}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {ld3}]
 
 ## Buttons
 set_property PACKAGE_PIN U18 [get_ports {rst}]

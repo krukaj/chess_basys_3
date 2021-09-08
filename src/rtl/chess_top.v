@@ -22,10 +22,10 @@ module chess_top(
       	input wire clk, // ClkPort will be the board's 100MHz clk
 		input wire Reset,
 
-		output wire Ld0,
-		output wire Ld1,
-		output wire Ld2,
-		output wire Ld3
+		output wire ld0,
+		output wire ld1,
+		output wire ld2,
+		output wire ld3
     );
 	 
 
@@ -177,6 +177,6 @@ begin
 	end
 end
 
-assign { Ld3, Ld2, Ld1, Ld0 } = logic_state; // useful for debugging, show state machine on LEDs
+assign { ld3, ld2, ld1, ld0 } = logic_state; // useful for debugging, show state machine on LEDs
 	
 endmodule
