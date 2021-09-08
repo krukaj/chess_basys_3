@@ -41,6 +41,8 @@ read_xdc {
 
 read_verilog {
     rtl/chess_top.v
+    rtl/chess_logic.v
+    rtl/debounce.v
 }
 
 add_files -fileset sim_1 {
