@@ -9,13 +9,21 @@ set_property PHASESHIFT_MODE WAVEFORM [get_cells -hierarchical *adv*]
 
 
 
-## Buttons
-set_property PACKAGE_PIN U18 [get_ports {rst}]
-set_property IOSTANDARD LVCMOS33 [get_ports {rst}]
+# Buttons
+set_property PACKAGE_PIN U18 [get_ports btnC]						
+	set_property IOSTANDARD LVCMOS33 [get_ports btnC]
+set_property PACKAGE_PIN T18 [get_ports btnU]						
+	set_property IOSTANDARD LVCMOS33 [get_ports btnU]
+set_property PACKAGE_PIN W19 [get_ports btnL]						
+	set_property IOSTANDARD LVCMOS33 [get_ports btnL]
+set_property PACKAGE_PIN T17 [get_ports btnR]						
+	set_property IOSTANDARD LVCMOS33 [get_ports btnR]
+set_property PACKAGE_PIN U17 [get_ports btnD]						
+	set_property IOSTANDARD LVCMOS33 [get_ports btnD]
 
 ## Switches
-set_property PACKAGE_PIN V17 [get_ports {sw}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {sw}]
+set_property PACKAGE_PIN V17 [get_ports {Reset}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {Reset}]
 
 ## Constraints for VS and HS
 set_property PACKAGE_PIN R19 [get_ports {vs}]
