@@ -21,6 +21,7 @@
 module chess_top(
       	input wire clk, 	// clk will be the board's 100MHz clk
 		input wire Reset, 	// For reset   
+		
 		input wire BtnL,
 		input wire BtnU,
 		input wire BtnD,

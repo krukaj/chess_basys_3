@@ -43,7 +43,7 @@ read_verilog {
     rtl/chess_top.v
     rtl/chess_logic.v
     rtl/debounce.v
-    rtl/vga_timiing.v
+    rtl/vga_timing.v
     rtl/display_interface.v
 }
 

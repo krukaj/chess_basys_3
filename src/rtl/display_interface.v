@@ -68,12 +68,12 @@ endgenerate
 
 wire [9:0] CounterX;
 wire [9:0] CounterY;
-vga_timiing syncgen(.clk(CLK), .reset(RESET),
-	.vga_h_sync(HSYNC), 
-	.vga_v_sync(VSYNC), 
+vga_timing syncgen(.clk(CLK), .rst(RESET),
+	.hsync(HSYNC), 
+	.vsync(VSYNC), 
 	.inDisplayArea(inDisplayArea), 
-	.CounterX(CounterX), 
-	.CounterY(CounterY));
+	.hcount(CounterX), 
+	.vcount(CounterY));
 
 /* Piece Definitions */
 localparam PIECE_NONE   = 3'b000;
