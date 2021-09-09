@@ -19,14 +19,14 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module chess_top(
-      	input wire clk, 	// clk will be the board's 100MHz clk
-		input wire rst, 	// For reset   
+      	input wire clk,
+		input wire rst,  
 		
-		input wire BtnL,
-		input wire BtnU,
-		input wire BtnD,
-		input wire BtnR, 
-		input wire BtnC,
+		input wire [4:0] btn,
+		// input wire BtnU,
+		// input wire BtnD,
+		// input wire BtnR, 
+		// input wire BtnC,
 
 		output wire vga_hsync,
 		output wire vga_vsync, 
@@ -34,8 +34,6 @@ module chess_top(
 		output wire [2:0] vga_g,
 		output wire [1:0] vga_b
     );
-	 
-/* Clocking */
 
 wire clk_25MHz;
 wire locked;
@@ -56,29 +54,21 @@ reset_main u_reset_main (
 
         .reset_out(Reset));
 
-/* Init debouncer */
-wire BtnC_pulse, BtnU_pulse, BtnR_pulse, BtnL_pulse, BtnD_pulse;
-debounce L_debounce(
-	.clk(clk_25MHz), .rst(Reset),
-	.Btn(BtnL), .Btn_pulse(BtnL_pulse));
-debounce R_debounce(
-	.clk(clk_25MHz), .rst(Reset),
-	.Btn(BtnR), .Btn_pulse(BtnR_pulse));
-debounce U_debounce(
-	.clk(clk_25MHz), .rst(Reset),
-	.Btn(BtnU), .Btn_pulse(BtnU_pulse));
-debounce D_debounce(
-	.clk(clk_25MHz), .rst(Reset),
-	.Btn(BtnD), .Btn_pulse(BtnD_pulse));
-debounce C_debounce(
-	.clk(clk_25MHz), .rst(Reset),
-	.Btn(BtnC), .Btn_pulse(BtnC_pulse));
+wire [4:0] Btn_pulse;
 
 reg [3:0] board[63:0];
 
 wire [255:0] passable_board;
 
 genvar i;
+
+generate for (i = 0;i < 5;i = i + 1) begin
+	debounce u_debounce(
+	.clk(clk_25MHz), .rst(Reset),
+	.Btn(btn[i]), .Btn_pulse(Btn_pulse[i]));
+end
+endgenerate
+
 generate for (i=0; i<64; i=i+1) begin: BOARD
 	assign passable_board[i*4+3 : i*4] = board[i];
 end
@@ -105,8 +95,8 @@ chess_logic logic_module(
 	.selected_addr(selected_piece_addr),
 	.hilite_selected_square(hilite_selected_square),
 
-	.BtnU(BtnU_pulse), .BtnL(BtnL_pulse), .BtnC(BtnC_pulse),
-	.BtnR(BtnR_pulse), .BtnD(BtnD_pulse),
+	.BtnU(Btn_pulse[1]), .BtnL(Btn_pulse[2]), .BtnC(Btn_pulse[0]),
+	.BtnR(Btn_pulse[3]), .BtnD(Btn_pulse[4]),
 	.state(), .move_is_legal(), .is_in_initial_state(is_in_initial_state)
 	);
 	
