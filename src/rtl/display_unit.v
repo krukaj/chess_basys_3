@@ -1,11 +1,11 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
-// Engineer: Alex Allsup & Kevin Wu
+// Engineer: kaja kruszewska
 // 
-// Create Date:    17:41:01 11/09/2016 
+// Create Date:    17:41:01 08/09/2016 
 // Design Name: 
-// Module Name:    display_interface 
+// Module Name:    display_unit 
 // Project Name: 
 // Target Devices: 
 // Tool versions: 
@@ -18,7 +18,7 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module display_interface(
+module display_unit(
     CLK, RESET,
 	 HSYNC, VSYNC, R, G, B,
 	 BOARD, 

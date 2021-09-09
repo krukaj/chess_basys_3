@@ -1,5 +1,5 @@
 set project chess
-set top_module chess_top
+set top_module chess
 set target xc7a35tcpg236-1
 set bitstream_file build/${project}.runs/impl_1/${top_module}.bit
 
@@ -40,11 +40,11 @@ read_xdc {
 }
 
 read_verilog {
-    rtl/chess_top.v
-    rtl/chess_logic.v
+    rtl/chess.v
+    rtl/logic_unit.v
     rtl/debounce.v
     rtl/vga_timing.v
-    rtl/display_interface.v 
+    rtl/display_unit.v 
     rtl/clk_main.v 
     rtl/reset_main.v 
 }

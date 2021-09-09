@@ -18,7 +18,7 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module chess_logic( 
+module logic_unit( 
     CLK, RESET,
     board_input,
     board_out_addr,

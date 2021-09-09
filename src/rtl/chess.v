@@ -1,11 +1,11 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
-// Engineer: Alex Allsup & Kevin Wu
+// Engineer: kaja kruszewska
 // 
-// Create Date:    17:37:14 11/09/2016 
+// Create Date:    17:37:14 07/09/2021 
 // Design Name: 
-// Module Name:    chess_top 
+// Module Name:    chess 
 // Project Name: 
 // Target Devices: 
 // Tool versions: 
@@ -18,15 +18,11 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module chess_top(
+module chess(
       	input wire clk,
 		input wire rst,  
 		
 		input wire [4:0] btn,
-		// input wire BtnU,
-		// input wire BtnD,
-		// input wire BtnR, 
-		// input wire BtnC,
 
 		output wire vga_hsync,
 		output wire vga_vsync, 
@@ -54,13 +50,9 @@ reset_main u_reset_main (
 
         .reset_out(Reset));
 
-wire [4:0] Btn_pulse;
-
-reg [3:0] board[63:0];
-
-wire [255:0] passable_board;
-
 genvar i;
+
+wire [4:0] Btn_pulse;
 
 generate for (i = 0;i < 5;i = i + 1) begin
 	debounce u_debounce(
@@ -68,6 +60,9 @@ generate for (i = 0;i < 5;i = i + 1) begin
 	.Btn(btn[i]), .Btn_pulse(Btn_pulse[i]));
 end
 endgenerate
+
+reg [3:0] board[63:0];
+wire [255:0] passable_board;
 
 generate for (i=0; i<64; i=i+1) begin: BOARD
 	assign passable_board[i*4+3 : i*4] = board[i];
@@ -83,7 +78,7 @@ wire hilite_selected_square;
 wire board_change_en_wire;
 wire is_in_initial_state;
 
-chess_logic logic_module(
+logic_unit u_logic_unit (
 	.CLK(clk_25MHz), 
 	.RESET(Reset),
 	.board_input(passable_board),
@@ -185,9 +180,8 @@ begin
 	end
 end
 
-/* Init VGA interface */
-display_interface display_interface(
-	.CLK(clk_25MHz), // 25 MHz
+display_unit u_display_unit (
+	.CLK(clk_25MHz), 
 	.RESET(Reset),
 	.HSYNC(vga_hsync), // direct outputs to VGA monitor
 	.VSYNC(vga_vsync),
