@@ -19,13 +19,13 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module display_unit(
-    CLK, RESET,
-	 HSYNC, VSYNC, R, G, B,
-	 BOARD, 
-	 CURSOR_ADDR, SELECT_ADDR, SELECT_EN
+    clk, rst,
+	HSYNC, VSYNC, R, G, B,
+	BOARD, 
+	CURSOR_ADDR, SELECT_ADDR, SELECT_EN
     );
 	 
-input wire CLK, RESET;
+input wire clk,rst;
 
 reg [7:0] output_color;
 output wire HSYNC, VSYNC;
@@ -68,7 +68,7 @@ endgenerate
 
 wire [9:0] CounterX;
 wire [9:0] CounterY;
-vga_timing syncgen(.clk(CLK), .rst(RESET),
+vga_timing syncgen(.clk(clk), .rst(rst),
 	.hsync(HSYNC), 
 	.vsync(VSYNC), 
 	.inDisplayArea(inDisplayArea), 
@@ -177,7 +177,7 @@ assign dark_square = counter_row[0] ^ counter_col[0]; // bit of a hack to determ
 													  // in a dark square or light square
 
 // Set the pixel colors based on the Counter positions
-always @(posedge CLK) begin
+always @(posedge clk) begin
 	if (!in_board) output_color <= RGB_OUTSIDE;
 	else begin
 		if (in_square_border) begin

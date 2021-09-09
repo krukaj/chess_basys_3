@@ -79,8 +79,8 @@ wire board_change_en_wire;
 wire is_in_initial_state;
 
 logic_unit u_logic_unit (
-	.CLK(clk_25MHz), 
-	.RESET(Reset),
+	.clk(clk_25MHz), 
+	.rst(Reset),
 	.board_input(passable_board),
 
 	.board_out_addr(board_change_addr),
@@ -181,8 +181,8 @@ begin
 end
 
 display_unit u_display_unit (
-	.CLK(clk_25MHz), 
-	.RESET(Reset),
+	.clk(clk_25MHz), 
+	.rst(Reset),
 	.HSYNC(vga_hsync), // direct outputs to VGA monitor
 	.VSYNC(vga_vsync),
 	.R(vga_r),

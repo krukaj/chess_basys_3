@@ -19,7 +19,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module logic_unit( 
-    CLK, RESET,
+    clk, rst,
     board_input,
     board_out_addr,
     board_out_piece,
@@ -36,7 +36,7 @@ module logic_unit(
     );
 
 /* Inputs */
-input wire CLK, RESET;
+input wire clk, rst;
 input wire BtnL, BtnU, BtnR, BtnD, BtnC;
 
 input wire [255:0] board_input;
@@ -100,8 +100,8 @@ assign hilite_selected_square = (state == PIECE_MOVE);
 //reg castle_state;
 
 /* State Machine NSL and OFL */
-always @ (posedge CLK, posedge RESET) begin
-    if (RESET) begin
+always @ (posedge clk) begin
+    if (rst) begin
         // initialization code here
         state <= INITIAL;
         //castle_state <= WRITE_KING;
