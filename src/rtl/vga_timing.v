@@ -15,10 +15,10 @@ module vga_timing (
                 input  wire rst,
 
                 output wire [9:0] vcount,
-                output wire vsync, 
+                output wire vsync,  
                 output wire [9:0] hcount,
                 output wire hsync,
-                output reg inDisplayArea  
+                output reg inDisplayArea   
         );
 
         localparam HOR_TOTAL_TIME = 799;
@@ -30,15 +30,13 @@ module vga_timing (
         localparam HOR_SYNC_TIME = 96;
         localparam VER_SYNC_TIME = 2;
 
-        reg [9:0] horizontal_counter;
-        reg [9:0] vertical_counter;
+        reg [11:0] horizontal_counter;
+        reg [11:0] vertical_counter;
         reg horizontal_sync;
-        reg horizontal_blank;
         reg vertical_sync;
-        reg vertical_blank;
 
-        reg [9:0] horizontal_counter_nxt;
-        reg [9:0] vertical_counter_nxt;
+        reg [11:0] horizontal_counter_nxt;
+        reg [11:0] vertical_counter_nxt;
         reg horizontal_sync_nxt ; 
         reg vertical_sync_nxt ;
         
@@ -47,7 +45,7 @@ module vga_timing (
                 if(rst)
                         inDisplayArea <= 1'b0;
                 else
-                        inDisplayArea <= (horizontal_counter < 640) && (vertical_counter < 80);
+                        inDisplayArea <= (horizontal_counter < 640) && (vertical_counter < 480);
 
 
         // Synchronical logic
@@ -56,7 +54,7 @@ module vga_timing (
                         horizontal_sync    <=  1'b0;
                         vertical_sync      <=  1'b0;
                         vertical_counter   <=  12'b0;
-                        horizontal_counter <= 12'b0;
+                        horizontal_counter <=  12'b0;
                 end else begin
                         horizontal_sync    <= horizontal_sync_nxt;
                         vertical_sync      <= vertical_sync_nxt;
@@ -65,7 +63,6 @@ module vga_timing (
                         
                 end
         end
-
 
         // Combinational logic
         always @* begin 
@@ -82,8 +79,8 @@ module vga_timing (
         end else begin
                 horizontal_counter_nxt = horizontal_counter + 1;
                 vertical_counter_nxt   = vertical_counter;
-                vertical_sync_nxt      =vertical_sync;
-        end 
+                vertical_sync_nxt      = vertical_sync;
+        end
         if (horizontal_counter >= HOR_SYNC_START && horizontal_counter < (HOR_SYNC_START + HOR_SYNC_TIME ))
                 horizontal_sync_nxt  = 1'b1;
         else
