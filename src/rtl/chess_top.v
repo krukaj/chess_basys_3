@@ -46,9 +46,9 @@ begin
 end
 
 wire game_logic_clk, vga_clk, debounce_clk;
-assign game_logic_clk = DIV_CLK[11]; // 24.4 kHz 
-assign vga_clk = DIV_CLK[1]; // 25MHz for pixel freq
-assign debounce_clk = DIV_CLK[11]; // 24.4 kHz; needs to match game_logic for the single clock pulses
+assign game_logic_clk = DIV_CLK[11]; 		// 24.4 kHz 
+assign vga_clk = DIV_CLK[1]; 				// 25MHz for pixel freq
+assign debounce_clk = DIV_CLK[11]; 			// 24.4 kHz; needs to match game_logic for the single clock pulses
 
 /* Init debouncer */
 wire BtnC_pulse, BtnU_pulse, BtnR_pulse, BtnL_pulse, BtnD_pulse;
@@ -96,7 +96,6 @@ wire[3:0] board_change_piece;
 wire[5:0] cursor_addr;
 wire[5:0] selected_piece_addr;
 wire hilite_selected_square;
-wire[3:0] logic_state;
 wire board_change_en_wire;
 wire is_in_initial_state;
 
@@ -114,7 +113,7 @@ chess_logic logic_module(
 
 	.BtnU(BtnU_pulse), .BtnL(BtnL_pulse), .BtnC(BtnC_pulse),
 	.BtnR(BtnR_pulse), .BtnD(BtnD_pulse),
-	.state(logic_state), .move_is_legal(), .is_in_initial_state(is_in_initial_state)
+	.state(), .move_is_legal(), .is_in_initial_state(is_in_initial_state)
 	);
 	
 always @(posedge game_logic_clk)

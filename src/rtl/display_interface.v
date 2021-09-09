@@ -32,7 +32,9 @@ output wire HSYNC, VSYNC;
 output wire [2:0] R;
 output wire [2:0] G;
 output wire [1:0] B;
+
 wire inDisplayArea;
+
 assign R = {
 	output_color[7] & inDisplayArea,
 	output_color[6] & inDisplayArea,
@@ -63,6 +65,7 @@ end
 endgenerate
 
 // INIT the sync generator and its support wires
+
 wire [9:0] CounterX;
 wire [9:0] CounterY;
 vga_timiing syncgen(.clk(CLK), .reset(RESET),
@@ -85,72 +88,19 @@ localparam COLOR_WHITE  = 0;
 localparam COLOR_BLACK  = 1;
 
 // ARTWORK
- reg [0:7] pawnArt [0:7];
-initial $readmemb("pawn.data", pawnArt);
-// 	8'b00000000,
-// 	8'b00000000,
-// 	8'b00000000,
-// 	8'b00000000,
-// 	8'b00011000,
-// 	8'b00111100,
-// 	8'b01111110,
-// 	8'b01111110
-// };
+reg [0:7] pawnArt [0:7];
+reg [0:7] bishopArt [0:7];
+reg [0:7] knightArt [0:7];
+reg [0:7] queenArt [0:7];
+reg [0:7] kingArt [0:7];
+reg [0:7] rookArt [0:7];
 
-// localparam bishopArt [0:7][0:7] = {
-// 	8'b00000000,
-// 	8'b00011000,
-// 	8'b00111100,
-// 	8'b00111100,
-// 	8'b00011000,
-// 	8'b00011000,
-// 	8'b00111100,
-// 	8'b11100111
-// };
-
-// localparam knightArt [0:7][0:7] = { 
-// 	8'b00011000,
-// 	8'b01111100,
-// 	8'b11111110,
-// 	8'b11101111,
-// 	8'b00000111,
-// 	8'b00011111,
-// 	8'b00111111,
-// 	8'b01111110
-// };
-
-// localparam queenArt [0:7][0:7] = { 
-// 	8'b00000000,
-// 	8'b01010101,
-// 	8'b01010101,
-// 	8'b01010101,
-// 	8'b01010101,
-// 	8'b01111111,
-// 	8'b01111111,
-// 	8'b01111111
-// };
-
-// localparam kingArt [0:7][0:7] = { 
-// 	8'b00011000,
-// 	8'b01111110,
-// 	8'b00011000,
-// 	8'b00011000,
-// 	8'b00111100,
-// 	8'b01111110,
-// 	8'b01111110,
-// 	8'b00111100
-// };
-
-// localparam rookArt [0:7][0:7] = { 
-// 	8'b00000000,
-// 	8'b01011010,
-// 	8'b01111110,
-// 	8'b00111100,
-// 	8'b00011000,
-// 	8'b00011000,
-// 	8'b00111100,
-// 	8'b01111110
-// };
+initial $readmemb("_pawn_art.data", 	pawnArt);
+initial $readmemb("_bishop_art.data",bishopArt);
+initial $readmemb("_knight_art.data",knightArt);
+initial $readmemb("_queen_art.data", queenArt);
+initial $readmemb("_king_art.data", 	kingArt);
+initial $readmemb("_rook_art.data", 	rookArt);
 
 localparam RGB_OUTSIDE = 8'b000_000_00;  // outside the drawn board
 localparam RGB_DARK_SQ = 8'b101_000_00;  // color of the dark squares
@@ -264,7 +214,7 @@ always @(posedge CLK) begin
 					end
 				end
 				PIECE_KNIGHT: begin
-					if (pawnArt[art_y][art_x]) begin
+					if (knightArt[art_y][art_x]) begin
 						if(board[{counter_row, counter_col}][3] == COLOR_BLACK)
 							output_color <= RGB_BLACK_PIECE;
 						else
@@ -278,7 +228,7 @@ always @(posedge CLK) begin
 					end
 				end
 				PIECE_BISHOP: begin
-					if (pawnArt[art_y][art_x]) begin
+					if (bishopArt[art_y][art_x]) begin
 						if(board[{counter_row, counter_col}][3] == COLOR_BLACK)
 							output_color <= RGB_BLACK_PIECE;
 						else
@@ -292,7 +242,7 @@ always @(posedge CLK) begin
 					end
 				end
 				PIECE_ROOK  : begin
-					if (pawnArt[art_y][art_x]) begin
+					if (rookArt[art_y][art_x]) begin
 						if(board[{counter_row, counter_col}][3] == COLOR_BLACK)
 							output_color <= RGB_BLACK_PIECE;
 						else
@@ -306,7 +256,7 @@ always @(posedge CLK) begin
 					end
 				end
 				PIECE_QUEEN : begin
-					if (pawnArt[art_y][art_x]) begin
+					if (queenArt[art_y][art_x]) begin
 						if(board[{counter_row, counter_col}][3] == COLOR_BLACK)
 							output_color <= RGB_BLACK_PIECE;
 						else
@@ -320,7 +270,7 @@ always @(posedge CLK) begin
 					end
 				end
 				PIECE_KING  : begin
-					if (pawnArt[art_y][art_x]) begin
+					if (kingArt[art_y][art_x]) begin
 						if(board[{counter_row, counter_col}][3] == COLOR_BLACK)
 							output_color <= RGB_BLACK_PIECE;
 						else
