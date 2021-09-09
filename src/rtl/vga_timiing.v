@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-module vga_timing(clk, reset,vga_h_sync, vga_v_sync, inDisplayArea, CounterX, CounterY);
+module vga_timiing(clk, reset,vga_h_sync, vga_v_sync, inDisplayArea, CounterX, CounterY);
 input clk;
 input reset;
 output vga_h_sync, vga_v_sync;

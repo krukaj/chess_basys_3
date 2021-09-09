@@ -1,9 +1,9 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
-// Engineer: Kaja Kruszewska
+// Engineer: Alex Allsup & Kevin Wu
 // 
-// Create Date:    18:07:14 07/09/2021
+// Create Date:    17:37:14 11/09/2016 
 // Design Name: 
 // Module Name:    chess_top 
 // Project Name: 
@@ -19,20 +19,41 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module chess_top(
-      	input wire clk, // ClkPort will be the board's 100MHz clk
-		input wire BtnL, input wire BtnU, input wire BtnD,input wire BtnR, BtnC,
-
-		input wire Reset,
-
-		output wire ld0,
-		output wire ld1,
-		output wire ld2,
-		output wire ld3
+      	clk, // ClkPort will be the board's 100MHz clk
+		BtnL, BtnU, BtnD, BtnR, BtnC,
+		Reset, // For reset   
+		vga_hsync, vga_vsync, 
+		vga_r0, vga_r1, vga_r2,
+		vga_g0, vga_g1, vga_g2,
+		vga_b0, vga_b1,
+		Ld0, Ld1, Ld2, Ld3, Ld4
     );
 	 
+/*  INPUTS */
+// Clock & Reset I/O
+input		Reset;
+input		BtnL, BtnU, BtnD, BtnR, BtnC;	
+//wire Reset;
+// assign Reset = Sw0;
+
+/* OUTPUTS */
+output wire vga_hsync, vga_vsync; 
+output wire vga_r0, vga_r1, vga_r2;
+output wire vga_g0, vga_g1, vga_g2;
+output wire vga_b0, vga_b1;
+output wire Ld0, Ld1, Ld2, Ld3, Ld4;
+
+// connect the vga color buses to the top design's outputs
+wire[2:0] vga_r;
+wire[2:0] vga_g;
+wire[1:0] vga_b;
+assign vga_r0 = vga_r[2]; assign vga_r1 = vga_r[1]; assign vga_r2 = vga_r[0];
+assign vga_g0 = vga_g[2]; assign vga_g1 = vga_g[1]; assign vga_g2 = vga_b[0];
+assign vga_b0 = vga_b[1]; assign vga_b1 = vga_b[0];
+
 
 /* Clocking */
-//input clk;
+input clk;
 reg[26:0] DIV_CLK;
 wire full_clock;
 BUFGP CLK_BUF(full_clock, clk);
@@ -45,6 +66,7 @@ end
 
 wire game_logic_clk, vga_clk, debounce_clk;
 assign game_logic_clk = DIV_CLK[11]; // 24.4 kHz 
+assign vga_clk = DIV_CLK[1]; // 25MHz for pixel freq
 assign debounce_clk = DIV_CLK[11]; // 24.4 kHz; needs to match game_logic for the single clock pulses
 
 /* Init debouncer */
@@ -64,7 +86,6 @@ debounce D_debounce(
 debounce C_debounce(
 	.CLK(debounce_clk), .RESET(Reset),
 	.Btn(BtnC), .Btn_pulse(BtnC_pulse));
-
 
 /* Piece Definitions */
 localparam PIECE_NONE 	= 3'b000;
@@ -199,6 +220,20 @@ begin
 	end
 end
 
-assign { ld3, ld2, ld1, ld0 } = logic_state; // useful for debugging, show state machine on LEDs
+assign { Ld3, Ld2, Ld1, Ld0 } = logic_state; // useful for debugging, show state machine on LEDs
+
+/* Init VGA interface */
+display_interface display_interface(
+	.CLK(vga_clk), // 25 MHz
+	.RESET(Reset),
+	.HSYNC(vga_hsync), // direct outputs to VGA monitor
+	.VSYNC(vga_vsync),
+	.R(vga_r),
+	.G(vga_g),
+	.B(vga_b),
+	.BOARD(passable_board), // the 64x4 array for the board contents
+	.CURSOR_ADDR(cursor_addr), // 6 bit address showing what square to hilite
+	.SELECT_ADDR(selected_piece_addr), // 6b address showing the address of which piece is selected
+	.SELECT_EN(hilite_selected_square)); // binary flag to show a selected piece
 	
 endmodule
