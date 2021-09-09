@@ -19,29 +19,23 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module chess_top(
-      	clk, // ClkPort will be the board's 100MHz clk
-		BtnL, BtnU, BtnD, BtnR, BtnC,
-		Reset, // For reset   
-		vga_hsync, vga_vsync, 
-		vga_r0, vga_r1, vga_r2,
-		vga_g0, vga_g1, vga_g2,
-		vga_b0, vga_b1,
-		Ld0, Ld1, Ld2, Ld3, Ld4
+      	input wire clk, // ClkPort will be the board's 100MHz clk
+		input wire BtnL,input wire BtnU,input wire BtnD,input wire BtnR, BtnC,
+		input wire Reset, // For reset   
+		output wire vga_hsync,output wire vga_vsync, 
+		output wire vga_r0,output wire vga_r1,output wire vga_r2,
+		output wire vga_g0,output wire vga_g1,output wire vga_g2,
+		output wire vga_b0,output wire vga_b1
     );
 	 
 /*  INPUTS */
 // Clock & Reset I/O
-input		Reset;
-input		BtnL, BtnU, BtnD, BtnR, BtnC;	
+
 //wire Reset;
 // assign Reset = Sw0;
 
 /* OUTPUTS */
-output wire vga_hsync, vga_vsync; 
-output wire vga_r0, vga_r1, vga_r2;
-output wire vga_g0, vga_g1, vga_g2;
-output wire vga_b0, vga_b1;
-output wire Ld0, Ld1, Ld2, Ld3, Ld4;
+
 
 // connect the vga color buses to the top design's outputs
 wire[2:0] vga_r;
@@ -53,7 +47,7 @@ assign vga_b0 = vga_b[1]; assign vga_b1 = vga_b[0];
 
 
 /* Clocking */
-input clk;
+//input clk;
 reg[26:0] DIV_CLK;
 wire full_clock;
 BUFGP CLK_BUF(full_clock, clk);
@@ -133,7 +127,7 @@ chess_logic logic_module(
 
 	.BtnU(BtnU_pulse), .BtnL(BtnL_pulse), .BtnC(BtnC_pulse),
 	.BtnR(BtnR_pulse), .BtnD(BtnD_pulse),
-	.state(logic_state), .move_is_legal(Ld4), .is_in_initial_state(is_in_initial_state)
+	.state(logic_state), .move_is_legal(), .is_in_initial_state(is_in_initial_state)
 	);
 	
 always @(posedge game_logic_clk)
@@ -219,8 +213,6 @@ begin
 		board[6'b000_111] <= { COLOR_BLACK, PIECE_ROOK };
 	end
 end
-
-assign { Ld3, Ld2, Ld1, Ld0 } = logic_state; // useful for debugging, show state machine on LEDs
 
 /* Init VGA interface */
 display_interface display_interface(
