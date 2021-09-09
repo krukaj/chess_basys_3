@@ -41,22 +41,21 @@ wire game_logic_clk, vga_clk, debounce_clk;
 assign debounce_clk = DIV_CLK[11]; // 24.4 kHz; needs to match game_logic for the single clock pulses
 
 /* Init debouncer */
+
 wire BtnC_pulse, BtnU_pulse, BtnR_pulse, BtnL_pulse, BtnD_pulse;
-debounce L_debounce(
-	.CLK(debounce_clk), .RESET(Reset),
-	.Btn(BtnL), .Btn_pulse(BtnL_pulse));
-debounce R_debounce(
-	.CLK(debounce_clk), .RESET(Reset),
-	.Btn(BtnR), .Btn_pulse(BtnR_pulse));
-debounce U_debounce(
-	.CLK(debounce_clk), .RESET(Reset),
-	.Btn(BtnU), .Btn_pulse(BtnU_pulse));
-debounce D_debounce(
-	.CLK(debounce_clk), .RESET(Reset),
-	.Btn(BtnD), .Btn_pulse(BtnD_pulse));
-debounce C_debounce(
-	.CLK(debounce_clk), .RESET(Reset),
-	.Btn(BtnC), .Btn_pulse(BtnC_pulse));
-
-
+debounce L_debounce (
+        .clk (debounce_clk), .reset (Reset), 
+        .sw (BtnL), .db_level (), .db_tick (BtnL_pulse));
+debounce R_debounce (
+        .clk (debounce_clk), .reset (Reset), 
+        .sw (BtnR), .db_level (), .db_tick (BtnR_pulse));
+debounce U_debounce (
+        .clk (debounce_clk), .reset (Reset), 
+        .sw (BtnU), .db_level (), .db_tick (BtnU_pulse));
+debounce D_debounce (
+        .clk (debounce_clk), .reset (Reset), 
+        .sw (BtnD), .db_level (), .db_tick (BtnD_pulse));
+debounce C_debounce (
+        .clk (debounce_clk), .reset (Reset), 
+        .sw (BtnC), .db_level (), .db_tick (BtnC_pulse));
 endmodule
