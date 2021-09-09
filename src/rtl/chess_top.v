@@ -19,35 +19,22 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module chess_top(
-      	input wire clk, // ClkPort will be the board's 100MHz clk
-		input wire BtnL,input wire BtnU,input wire BtnD,input wire BtnR, BtnC,
-		input wire Reset, // For reset   
-		output wire vga_hsync,output wire vga_vsync, 
-		output wire vga_r0,output wire vga_r1,output wire vga_r2,
-		output wire vga_g0,output wire vga_g1,output wire vga_g2,
-		output wire vga_b0,output wire vga_b1
+      	input wire clk, 	// clk will be the board's 100MHz clk
+		input wire Reset, 	// For reset   
+		input wire BtnL,
+		input wire BtnU,
+		input wire BtnD,
+		input wire BtnR, 
+		input wire BtnC,
+
+		output wire vga_hsync,
+		output wire vga_vsync, 
+		output wire [2:0] vga_r,
+		output wire [2:0] vga_g,
+		output wire [1:0] vga_b
     );
 	 
-/*  INPUTS */
-// Clock & Reset I/O
-
-//wire Reset;
-// assign Reset = Sw0;
-
-/* OUTPUTS */
-
-
-// connect the vga color buses to the top design's outputs
-wire[2:0] vga_r;
-wire[2:0] vga_g;
-wire[1:0] vga_b;
-assign vga_r0 = vga_r[2]; assign vga_r1 = vga_r[1]; assign vga_r2 = vga_r[0];
-assign vga_g0 = vga_g[2]; assign vga_g1 = vga_g[1]; assign vga_g2 = vga_b[0];
-assign vga_b0 = vga_b[1]; assign vga_b1 = vga_b[0];
-
-
 /* Clocking */
-//input clk;
 reg[26:0] DIV_CLK;
 wire full_clock;
 BUFGP CLK_BUF(full_clock, clk);
