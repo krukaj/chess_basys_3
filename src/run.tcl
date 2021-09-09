@@ -1,7 +1,7 @@
 set project chess
 set top_module chess
 set target xc7a35tcpg236-1
-set bitstream_file build/${project}.runs/impl_1/${top_module}.bit
+set bitstream_file ../vivado/build/${project}.runs/impl_1/${top_module}.bit
 
 proc usage {} {
     puts "usage: vivado -mode tcl -source [info script] -tclargs \[simulation/bitstream/program\]"
@@ -31,8 +31,8 @@ if {[lindex $argv 0] == "program"} {
     
     exit
 } else {
-    file mkdir build
-    create_project ${project} build -part ${target} -force
+    file mkdir ../vivado/build
+    create_project ${project} ../vivado/build -part ${target} -force
 }
 
 read_xdc {
@@ -67,5 +67,6 @@ if {[lindex $argv 0] == "simulation"} {
 
     launch_runs impl_1 -to_step write_bitstream -jobs 8
     wait_on_run impl_1
+    file delete -force .Xil
     exit
 }
