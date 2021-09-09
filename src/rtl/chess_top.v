@@ -53,21 +53,21 @@ assign debounce_clk = DIV_CLK[11]; 			// 24.4 kHz; needs to match game_logic for
 
 /* Init debouncer */
 wire BtnC_pulse, BtnU_pulse, BtnR_pulse, BtnL_pulse, BtnD_pulse;
-debounce L_debounce(
-	.CLK(debounce_clk), .RESET(Reset),
-	.Btn(BtnL), .Btn_pulse(BtnL_pulse));
-debounce R_debounce(
-	.CLK(debounce_clk), .RESET(Reset),
-	.Btn(BtnR), .Btn_pulse(BtnR_pulse));
-debounce U_debounce(
-	.CLK(debounce_clk), .RESET(Reset),
-	.Btn(BtnU), .Btn_pulse(BtnU_pulse));
-debounce D_debounce(
-	.CLK(debounce_clk), .RESET(Reset),
-	.Btn(BtnD), .Btn_pulse(BtnD_pulse));
-debounce C_debounce(
-	.CLK(debounce_clk), .RESET(Reset),
-	.Btn(BtnC), .Btn_pulse(BtnC_pulse));
+debounce L_debounce (
+        .clk (debounce_clk), .reset (Reset), 
+        .sw (BtnL), .db_level (), .db_tick (BtnL_pulse));
+debounce R_debounce (
+        .clk (debounce_clk), .reset (Reset), 
+        .sw (BtnR), .db_level (), .db_tick (BtnR_pulse));
+debounce U_debounce (
+        .clk (debounce_clk), .reset (Reset), 
+        .sw (BtnU), .db_level (), .db_tick (BtnU_pulse));
+debounce D_debounce (
+        .clk (debounce_clk), .reset (Reset), 
+        .sw (BtnD), .db_level (), .db_tick (BtnD_pulse));
+debounce C_debounce (
+        .clk (debounce_clk), .reset (Reset), 
+        .sw (BtnC), .db_level (), .db_tick (BtnC_pulse));
 
 /* Piece Definitions */
 localparam PIECE_NONE 	= 3'b000;
@@ -214,5 +214,5 @@ display_interface display_interface(
 	.CURSOR_ADDR(cursor_addr), // 6 bit address showing what square to hilite
 	.SELECT_ADDR(selected_piece_addr), // 6b address showing the address of which piece is selected
 	.SELECT_EN(hilite_selected_square)); // binary flag to show a selected piece
-	
+
 endmodule
