@@ -90,6 +90,7 @@ localparam COLOR_BLACK  = 1;
 reg player_to_move;
 
 output reg move_is_legal; // signal will be generated in combinational logic
+reg move_is_legal_nxt; // signal will be generated in combinational logic
 
 /* State Machine Definition */
 // use encoded-assignment
@@ -113,9 +114,11 @@ always @ (posedge clk) begin
         board_out_addr <= 6'b000000;
         board_out_piece <= 4'b0000;
         board_change_enable <= 0;
+        move_is_legal <= 1'b0;
 	
     end
     else begin
+        move_is_legal <= move_is_legal_nxt;
         // State machine code from here
         case (state)
             INITIAL :
@@ -219,6 +222,7 @@ end
 
 // Logic to generate the move_is_legal signal
 always @(*) begin
+    move_is_legal_nxt = move_is_legal;
     if(selected_contents[2:0] == PIECE_PAWN)
         begin
             if (player_to_move == COLOR_WHITE) begin // pawn moves forward (decreasing MSB)
@@ -228,19 +232,19 @@ always @(*) begin
                     && cursor_contents[2:0] == PIECE_NONE // no piece at dest?
                     && board[selected_addr - 6'b001_000][2:0] == PIECE_NONE // no piece in way?
 						  && cursor_addr[5:3] < selected_addr[5:3] )
-                    move_is_legal = 1; // moving from home row by 2
+                    move_is_legal_nxt = 1; // moving from home row by 2
                 else if(v_delta == 1 // move forward by 1?
                     && h_delta == 0
                     && cursor_contents[2:0] == PIECE_NONE
 						  && cursor_addr[5:3] < selected_addr[5:3] )
-                    move_is_legal = 1;
+                    move_is_legal_nxt = 1;
                 else if(v_delta == 1
                     && (h_delta == 1) // moving diagonally by 1?
                     && cursor_contents[3] == COLOR_BLACK // capturing opponent?
                     && cursor_contents[2:0] != PIECE_NONE // capturing something?
 						  && cursor_addr[5:3] < selected_addr[5:3] )
-                    move_is_legal = 1;
-                else move_is_legal = 0;
+                    move_is_legal_nxt = 1;
+                else move_is_legal_nxt = 0;
             end
             else if (player_to_move == COLOR_BLACK) begin
                 if (v_delta == 2 // skip forward by 2?
@@ -249,58 +253,58 @@ always @(*) begin
                     && cursor_contents[2:0] == PIECE_NONE // no piece at dest?
                     && board[selected_addr + 6'b001_000][2:0] == PIECE_NONE // no piece in way? 
 						  && cursor_addr[5:3] > selected_addr[5:3] )
-                    move_is_legal = 1; // moving from home row by 2
+                    move_is_legal_nxt = 1; // moving from home row by 2
                 else if(v_delta == 1 // move forward by 1?
                     && h_delta == 0
                     && cursor_contents[2:0] == PIECE_NONE
 						  && cursor_addr[5:3] > selected_addr[5:3] )
-                    move_is_legal = 1;
+                    move_is_legal_nxt = 1;
                 else if(v_delta == 1
                     && (h_delta==1) // moving diagonally by 1?
                     && cursor_contents[3] == COLOR_WHITE // capturing opponent?
                     && cursor_contents[2:0] != PIECE_NONE // capturing something?
 						  && cursor_addr[5:3] > selected_addr[5:3] )
-                    move_is_legal = 1;
-                else move_is_legal = 0;
+                    move_is_legal_nxt = 1;
+                else move_is_legal_nxt = 0;
                 // TODO implement en passant
             end
         end
 
     else if(selected_contents[2:0] == PIECE_ROOK)
         begin
-            move_is_legal = (h_delta==0 || v_delta==0);
+            move_is_legal_nxt = (h_delta==0 || v_delta==0);
             // well that was easy
         end
 
     else if(selected_contents[2:0] == PIECE_QUEEN)
         begin
-            move_is_legal =
+            move_is_legal_nxt =
                 (  h_delta==0 || v_delta==0  // "rook" move
                 || h_delta == v_delta );     // "bishop" move
         end
 
     else if(selected_contents[2:0] == PIECE_KING)
         begin
-            move_is_legal =
+            move_is_legal_nxt =
                 ( h_delta == 0 || h_delta == 1)
 				 && ( v_delta == 0 || v_delta == 1);
         end
 
     else if(selected_contents[2:0] == PIECE_BISHOP)
         begin
-            move_is_legal =
+            move_is_legal_nxt =
                 (  h_delta == v_delta );
         end
 
     else if(selected_contents[2:0] == PIECE_KNIGHT)
         begin
             // must move "L" shape (2 in one dir and 1 in the other)
-            move_is_legal =
+            move_is_legal_nxt =
                 (   h_delta==2 && v_delta==1 
                 ||  v_delta==2 && h_delta==1 );
         end
      
-	 else move_is_legal = 0;
+	 else move_is_legal_nxt = 0;
 end 
 
 endmodule

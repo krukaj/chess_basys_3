@@ -19,48 +19,31 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module display_unit(
-    clk, rst,
-	HSYNC, VSYNC, R, G, B,
-	BOARD, 
-	CURSOR_ADDR, SELECT_ADDR, SELECT_EN
-    );
-	 
-input wire clk,rst;
+    input wire clk,
+	input wire rst,
 
+	input wire [255:0] board_in,
+	input wire [5:0] cursor_addr,
+	input wire [5:0] select_addr,
+	input wire select_en,
+
+	output wire hsync,
+	output wire vsync,
+	output wire [2:0] r,
+	output wire [2:0] g,
+	output wire [1:0] b
+    );
+	
 reg [7:0] output_color;
-output wire HSYNC, VSYNC;
-output wire [2:0] R;
-output wire [2:0] G;
-output wire [1:0] B;
 
 wire inDisplayArea;
 
-assign R = {
-	output_color[7] & inDisplayArea,
-	output_color[6] & inDisplayArea,
-	output_color[5] & inDisplayArea
-};
-assign G = {
-	output_color[4] & inDisplayArea,
-	output_color[3] & inDisplayArea,
-	output_color[2] & inDisplayArea
-};
-assign B = {
-	output_color[1] & inDisplayArea,
-	output_color[0] & inDisplayArea
-};
-
-input wire [5:0] CURSOR_ADDR;
-input wire [5:0] SELECT_ADDR;
-input wire SELECT_EN;
-
 // BOARD is the incoming 64 bus from the top's board reg
 // board will be re-vectored into a 64x4 for ease of use
-input wire [255:0] BOARD;
 wire[3:0] board[63:0];
 genvar i;
 generate for (i=0; i<64; i=i+1) begin: REWIRE_BOARD
-	assign board[i] = BOARD[i*4+3 : i*4];
+	assign board[i] = board_in[i*4+3 : i*4];
 end
 endgenerate
 
@@ -69,8 +52,8 @@ endgenerate
 wire [9:0] CounterX;
 wire [9:0] CounterY;
 vga_timing syncgen(.clk(clk), .rst(rst),
-	.hsync(HSYNC), 
-	.vsync(VSYNC), 
+	.hsync(hsync), 
+	.vsync(vsync), 
 	.inDisplayArea(inDisplayArea), 
 	.hcount(CounterX), 
 	.vcount(CounterY));
@@ -181,9 +164,9 @@ always @(posedge clk) begin
 	if (!in_board) output_color <= RGB_OUTSIDE;
 	else begin
 		if (in_square_border) begin
-			if (CURSOR_ADDR == { counter_row, counter_col }) 
+			if (cursor_addr == { counter_row, counter_col }) 
 				output_color <= RGB_CURSOR;
-			else if (in_square_border && SELECT_ADDR == { counter_row, counter_col } && SELECT_EN)
+			else if (in_square_border && select_addr == { counter_row, counter_col } && select_en)
 				output_color <= RGB_SELECTED;
 			else if (dark_square) 
 				output_color <= RGB_DARK_SQ;
@@ -288,5 +271,10 @@ always @(posedge clk) begin
 		end
 	end
 end
+
+
+assign r = {output_color[7] & inDisplayArea,output_color[6] & inDisplayArea,output_color[5] & inDisplayArea};
+assign g = {output_color[4] & inDisplayArea,output_color[3] & inDisplayArea,output_color[2] & inDisplayArea};
+assign b = {output_color[1] & inDisplayArea,output_color[0] & inDisplayArea};
 
 endmodule

@@ -183,14 +183,14 @@ end
 display_unit u_display_unit (
 	.clk(clk_25MHz), 
 	.rst(Reset),
-	.HSYNC(vga_hsync), // direct outputs to VGA monitor
-	.VSYNC(vga_vsync),
-	.R(vga_r),
-	.G(vga_g),
-	.B(vga_b),
-	.BOARD(passable_board), // the 64x4 array for the board contents
-	.CURSOR_ADDR(cursor_addr), // 6 bit address showing what square to hilite
-	.SELECT_ADDR(selected_piece_addr), // 6b address showing the address of which piece is selected
-	.SELECT_EN(hilite_selected_square)); // binary flag to show a selected piece
+	.hsync(vga_hsync), // direct outputs to VGA monitor
+	.vsync(vga_vsync),
+	.r(vga_r),
+	.g(vga_g),
+	.b(vga_b),
+	.board_in(passable_board), // the 64x4 array for the board contents
+	.cursor_addr(cursor_addr), // 6 bit address showing what square to hilite
+	.select_addr(selected_piece_addr), // 6b address showing the address of which piece is selected
+	.select_en(hilite_selected_square)); // binary flag to show a selected piece
 
 endmodule
