@@ -44,7 +44,9 @@ read_verilog {
     rtl/chess_logic.v
     rtl/debounce.v
     rtl/vga_timing.v
-    rtl/display_interface.v
+    rtl/display_interface.v 
+    rtl/clk_main.v 
+    rtl/reset_main.v 
 }
 
 add_files -fileset sim_1 {

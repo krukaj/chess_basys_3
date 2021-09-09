@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 module chess_top(
       	input wire clk, 	// clk will be the board's 100MHz clk
-		input wire Reset, 	// For reset   
+		input wire rst, 	// For reset   
 		
 		input wire BtnL,
 		input wire BtnU,
@@ -36,50 +36,43 @@ module chess_top(
     );
 	 
 /* Clocking */
-reg[26:0] DIV_CLK;
-wire full_clock;
-BUFGP CLK_BUF(full_clock, clk);
 
-always @(posedge full_clock, posedge Reset)
-begin
-	if (Reset) DIV_CLK <= 0;
-	else DIV_CLK <= DIV_CLK + 1'b1;
-end
+wire clk_25MHz;
+wire locked;
 
-wire game_logic_clk, vga_clk, debounce_clk;
-assign game_logic_clk = DIV_CLK[11]; 		// 24.4 kHz 
-assign vga_clk = DIV_CLK[1]; 				// 25MHz for pixel freq
-assign debounce_clk = DIV_CLK[11]; 			// 24.4 kHz; needs to match game_logic for the single clock pulses
+clk_main u_clk_main (
+		.clk(clk),
+		.reset(rst),
+
+		.locked(locked),
+		.clk_25MHz(clk_25MHz),
+		.clk_65MHz());
+
+wire Reset;
+
+reset_main u_reset_main (
+        .clk(clk_25MHz),
+        .locked(locked),
+
+        .reset_out(Reset));
 
 /* Init debouncer */
 wire BtnC_pulse, BtnU_pulse, BtnR_pulse, BtnL_pulse, BtnD_pulse;
-debounce L_debounce (
-        .clk (debounce_clk), .reset (Reset), 
-        .sw (BtnL), .db_level (), .db_tick (BtnL_pulse));
-debounce R_debounce (
-        .clk (debounce_clk), .reset (Reset), 
-        .sw (BtnR), .db_level (), .db_tick (BtnR_pulse));
-debounce U_debounce (
-        .clk (debounce_clk), .reset (Reset), 
-        .sw (BtnU), .db_level (), .db_tick (BtnU_pulse));
-debounce D_debounce (
-        .clk (debounce_clk), .reset (Reset), 
-        .sw (BtnD), .db_level (), .db_tick (BtnD_pulse));
-debounce C_debounce (
-        .clk (debounce_clk), .reset (Reset), 
-        .sw (BtnC), .db_level (), .db_tick (BtnC_pulse));
-
-/* Piece Definitions */
-localparam PIECE_NONE 	= 3'b000;
-localparam PIECE_PAWN	= 3'b001;
-localparam PIECE_KNIGHT	= 3'b010;
-localparam PIECE_BISHOP	= 3'b011;
-localparam PIECE_ROOK	= 3'b100;
-localparam PIECE_QUEEN	= 3'b101;
-localparam PIECE_KING	= 3'b110;
-
-localparam COLOR_WHITE	= 0;
-localparam COLOR_BLACK	= 1;
+debounce L_debounce(
+	.clk(clk_25MHz), .rst(Reset),
+	.Btn(BtnL), .Btn_pulse(BtnL_pulse));
+debounce R_debounce(
+	.clk(clk_25MHz), .rst(Reset),
+	.Btn(BtnR), .Btn_pulse(BtnR_pulse));
+debounce U_debounce(
+	.clk(clk_25MHz), .rst(Reset),
+	.Btn(BtnU), .Btn_pulse(BtnU_pulse));
+debounce D_debounce(
+	.clk(clk_25MHz), .rst(Reset),
+	.Btn(BtnD), .Btn_pulse(BtnD_pulse));
+debounce C_debounce(
+	.clk(clk_25MHz), .rst(Reset),
+	.Btn(BtnC), .Btn_pulse(BtnC_pulse));
 
 reg [3:0] board[63:0];
 
@@ -101,7 +94,7 @@ wire board_change_en_wire;
 wire is_in_initial_state;
 
 chess_logic logic_module(
-	.CLK(game_logic_clk), 
+	.CLK(clk_25MHz), 
 	.RESET(Reset),
 	.board_input(passable_board),
 
@@ -117,7 +110,7 @@ chess_logic logic_module(
 	.state(), .move_is_legal(), .is_in_initial_state(is_in_initial_state)
 	);
 	
-always @(posedge game_logic_clk)
+always @(posedge clk_25MHz)
 begin 
 	if (Reset != 1) begin 
 		if (board_change_en_wire == 1)  
@@ -127,83 +120,84 @@ begin
 	end
 	if (is_in_initial_state)
 	begin
-		board[6'b111_000] <= { COLOR_WHITE, PIECE_ROOK };
-		board[6'b111_001] <= { COLOR_WHITE, PIECE_KNIGHT };
-		board[6'b111_010] <= { COLOR_WHITE, PIECE_BISHOP };
-		board[6'b111_011] <= { COLOR_WHITE, PIECE_QUEEN };
-		board[6'b111_100] <= { COLOR_WHITE, PIECE_KING };
-		board[6'b111_101] <= { COLOR_WHITE, PIECE_BISHOP };
-		board[6'b111_110] <= { COLOR_WHITE, PIECE_KNIGHT };
-		board[6'b111_111] <= { COLOR_WHITE, PIECE_ROOK };
+		board[6'b111_000] <= { 1'b0, 3'b100 };
+		board[6'b111_001] <= { 1'b0, 3'b010 };
+		board[6'b111_010] <= { 1'b0, 3'b011 };
+		board[6'b111_011] <= { 1'b0, 3'b101 };
+		board[6'b111_100] <= { 1'b0, 3'b110 };
+		board[6'b111_101] <= { 1'b0, 3'b011 };
+		board[6'b111_110] <= { 1'b0, 3'b010 };
+		board[6'b111_111] <= { 1'b0, 3'b100 };
 		
-		board[6'b110_000] <= { COLOR_WHITE, PIECE_PAWN };
-		board[6'b110_001] <= { COLOR_WHITE, PIECE_PAWN };
-		board[6'b110_010] <= { COLOR_WHITE, PIECE_PAWN };
-		board[6'b110_011] <= { COLOR_WHITE, PIECE_PAWN };
-		board[6'b110_100] <= { COLOR_WHITE, PIECE_PAWN };
-		board[6'b110_101] <= { COLOR_WHITE, PIECE_PAWN };
-		board[6'b110_110] <= { COLOR_WHITE, PIECE_PAWN };
-		board[6'b110_111] <= { COLOR_WHITE, PIECE_PAWN };
+		board[6'b110_000] <= { 1'b0, 3'b001 };
+		board[6'b110_001] <= { 1'b0, 3'b001 };
+		board[6'b110_010] <= { 1'b0, 3'b001 };
+		board[6'b110_011] <= { 1'b0, 3'b001 };
+		board[6'b110_100] <= { 1'b0, 3'b001 };
+		board[6'b110_101] <= { 1'b0, 3'b001 };
+		board[6'b110_110] <= { 1'b0, 3'b001 };
+		board[6'b110_111] <= { 1'b0, 3'b001 };
 		
-		board[6'b101_000] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b101_001] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b101_010] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b101_011] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b101_100] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b101_101] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b101_110] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b101_111] <= { COLOR_WHITE, PIECE_NONE };
+		board[6'b101_000] <= { 1'b0, 3'b000 };
+		board[6'b101_001] <= { 1'b0, 3'b000 };
+		board[6'b101_010] <= { 1'b0, 3'b000 };
+		board[6'b101_011] <= { 1'b0, 3'b000 };
+		board[6'b101_100] <= { 1'b0, 3'b000 };
+		board[6'b101_101] <= { 1'b0, 3'b000 };
+		board[6'b101_110] <= { 1'b0, 3'b000 };
+		board[6'b101_111] <= { 1'b0, 3'b000 };
 		
-		board[6'b100_000] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b100_001] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b100_010] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b100_011] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b100_100] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b100_101] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b100_110] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b100_111] <= { COLOR_WHITE, PIECE_NONE };
+		board[6'b100_000] <= { 1'b0, 3'b000 };
+		board[6'b100_001] <= { 1'b0, 3'b000 };
+		board[6'b100_010] <= { 1'b0, 3'b000 };
+		board[6'b100_011] <= { 1'b0, 3'b000 };
+		board[6'b100_100] <= { 1'b0, 3'b000 };
+		board[6'b100_101] <= { 1'b0, 3'b000 };
+		board[6'b100_110] <= { 1'b0, 3'b000 };
+		board[6'b100_111] <= { 1'b0, 3'b000 };
 		
-		board[6'b011_000] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b011_001] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b011_010] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b011_011] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b011_100] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b011_101] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b011_110] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b011_111] <= { COLOR_WHITE, PIECE_NONE };
+		board[6'b011_000] <= { 1'b0, 3'b000 };
+		board[6'b011_001] <= { 1'b0, 3'b000 };
+		board[6'b011_010] <= { 1'b0, 3'b000 };
+		board[6'b011_011] <= { 1'b0, 3'b000 };
+		board[6'b011_100] <= { 1'b0, 3'b000 };
+		board[6'b011_101] <= { 1'b0, 3'b000 };
+		board[6'b011_110] <= { 1'b0, 3'b000 };
+		board[6'b011_111] <= { 1'b0, 3'b000 };
 		
-		board[6'b010_000] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b010_001] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b010_010] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b010_011] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b010_100] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b010_101] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b010_110] <= { COLOR_WHITE, PIECE_NONE };
-		board[6'b010_111] <= { COLOR_WHITE, PIECE_NONE };
+		board[6'b010_000] <= { 1'b0, 3'b000 };
+		board[6'b010_001] <= { 1'b0, 3'b000 };
+		board[6'b010_010] <= { 1'b0, 3'b000 };
+		board[6'b010_011] <= { 1'b0, 3'b000 };
+		board[6'b010_100] <= { 1'b0, 3'b000 };
+		board[6'b010_101] <= { 1'b0, 3'b000 };
+		board[6'b010_110] <= { 1'b0, 3'b000 };
+		board[6'b010_111] <= { 1'b0, 3'b000 };
 		
-		board[6'b001_000] <= { COLOR_BLACK, PIECE_PAWN };
-		board[6'b001_001] <= { COLOR_BLACK, PIECE_PAWN };
-		board[6'b001_010] <= { COLOR_BLACK, PIECE_PAWN };
-		board[6'b001_011] <= { COLOR_BLACK, PIECE_PAWN };
-		board[6'b001_100] <= { COLOR_BLACK, PIECE_PAWN };
-		board[6'b001_101] <= { COLOR_BLACK, PIECE_PAWN };
-		board[6'b001_110] <= { COLOR_BLACK, PIECE_PAWN };
-		board[6'b001_111] <= { COLOR_BLACK, PIECE_PAWN };
+		board[6'b001_000] <= { 1'b1, 3'b001 };
+		board[6'b001_001] <= { 1'b1, 3'b001 };
+		board[6'b001_010] <= { 1'b1, 3'b001 };
+		board[6'b001_011] <= { 1'b1, 3'b001 };
+		board[6'b001_100] <= { 1'b1, 3'b001 };
+		board[6'b001_101] <= { 1'b1, 3'b001 };
+		board[6'b001_110] <= { 1'b1, 3'b001 };
+		board[6'b001_111] <= { 1'b1, 3'b001 };
+
+		board[6'b000_000] <= { 1'b1, 3'b100 };
+		board[6'b000_001] <= { 1'b1, 3'b010 };
+		board[6'b000_010] <= { 1'b1, 3'b011 };
+		board[6'b000_011] <= { 1'b1, 3'b101 };
+		board[6'b000_100] <= { 1'b1, 3'b110 };
+		board[6'b000_101] <= { 1'b1, 3'b011 };
+		board[6'b000_110] <= { 1'b1, 3'b010 };
+		board[6'b000_111] <= { 1'b1, 3'b100 };
 		
-		board[6'b000_000] <= { COLOR_BLACK, PIECE_ROOK };
-		board[6'b000_001] <= { COLOR_BLACK, PIECE_KNIGHT };
-		board[6'b000_010] <= { COLOR_BLACK, PIECE_BISHOP };
-		board[6'b000_011] <= { COLOR_BLACK, PIECE_QUEEN };
-		board[6'b000_100] <= { COLOR_BLACK, PIECE_KING };
-		board[6'b000_101] <= { COLOR_BLACK, PIECE_BISHOP };
-		board[6'b000_110] <= { COLOR_BLACK, PIECE_KNIGHT };
-		board[6'b000_111] <= { COLOR_BLACK, PIECE_ROOK };
 	end
 end
 
 /* Init VGA interface */
 display_interface display_interface(
-	.CLK(vga_clk), // 25 MHz
+	.CLK(clk_25MHz), // 25 MHz
 	.RESET(Reset),
 	.HSYNC(vga_hsync), // direct outputs to VGA monitor
 	.VSYNC(vga_vsync),

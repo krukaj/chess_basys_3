@@ -2,9 +2,9 @@
 
 
 module debounce(
-	input CLK,         // should be at about 24.4 kHz
-	input RESET,
-    input Btn,
+	input wire clk,         // should be at about 24.4 kHz
+	input wire rst,
+    input wire Btn,
     output reg Btn_pulse);
 
 
@@ -14,9 +14,9 @@ reg[2:0] state;
 localparam max_i = 2000; // should yield a wait time of approx 0.25s
 reg[13:0] I;
 
-always @(posedge CLK, posedge RESET)
+always @(posedge clk)
 begin
-	if (RESET) begin
+	if (rst) begin
 		Btn_pulse <= 0;
 		state <= INIT;
 		I <= 0;

@@ -24,8 +24,8 @@ set_property PACKAGE_PIN U17 [get_ports {BtnD}]
 	set_property IOSTANDARD LVCMOS33 [get_ports {BtnD}]
 
 ## Switches
-set_property PACKAGE_PIN V17 [get_ports {Reset}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {Reset}]
+set_property PACKAGE_PIN V17 [get_ports {rst}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {rst}]
 
 ## Constraints for VS and HS
 set_property PACKAGE_PIN R19 [get_ports {vga_vsync}]
